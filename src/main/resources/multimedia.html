@@ -116,7 +116,7 @@ function FLVPlayer(opts)
     if (location.hash)
     {
         var hash = location.hash.substring(1);
-        if (hash.match(/^\d{12}-\d{1,2}$/gi)) TAG = hash;
+        TAG = hash;
     }
     function playVideo()
     {
