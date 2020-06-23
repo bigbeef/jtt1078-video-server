@@ -1,4 +1,4 @@
-package cn.org.hentai.jtt1078.configuration;
+package cn.org.hentai.jtt1078.config;
 
 
 import cn.org.hentai.jtt1078.server.HttpServer;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * @author winfed
  **/
 @Configuration
-public class NettyServerConfiguration {
+public class NettyServerConfig {
 
 
     @Value("${server.http.port}")
