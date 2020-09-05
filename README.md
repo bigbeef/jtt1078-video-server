@@ -19,19 +19,13 @@
 ## jtt1078-video-server
 基于JT/T 1078协议实现的视频转播服务器，当车机服务器端主动下发**音视频实时传输控制**消息（0x9101）后，车载终端连接到此服务器后，发送指定摄像头所采集的视频流，此项目服务器完成音视频数据接收并转码，完成转播的流程，提供各平台的播放支撑。
 
+同时，本项目在配置 **ffmpeg路径** 及 **rtmp url** 后，将同时输出一路到 **RTMP** 服务器上去，为移动端播放提供音视频支持（注意，由于旁路的RTMP流是通过ffmpeg子进程实现，并且有音频转码的过程，所以性能将有很大的下降）。
+
 > 非常感谢 **孤峰赏月/hx（[github/jelycom](https://github.com/jelycom)）** 提供的mp3音频支持。
 
 ## 分支说明
-本项目目前有5个分支，flv分支最完善，各分支的情况区别如下：
-
-|分支|说明|跨平台？|优势|劣势|
-|---|---|---|---|---|
-|master|通过ffmpeg子进程实现的纯视频RTMP推流方案|平台不限|简单，首屏时间最长|不支持音频，低并发|
-|fifo|通过ffmpeg子进程实现的音视频合并推流RTMP方案|需要linux mkfifo支持|不稳定，需要掌握ffmpeg|可以支持各种视频编码，低并发|
-|multimedia|通过ffmpeg完成h264到flv封装，并直接提供HTTP-FLV支持的视频方案，音视频通过chunked分块传输到前端直接播放|平台不限|-|需要ffmpeg支持，低并发|
-|flv|直接使用java完成音视频到flv的封装，并直接提供HTTP-FLV支持的视频方案|平台不限|首屏时间最短|不支持其它形式的输出|
-
-使用了ffmpeg子进程模式的，都可以想办法同时输出多个目标，比如到RTMP，RTMP还可以转为HLS等。
+原项目有4个分支不同的实现方式，现将其它分支全部删除，已经用不上了。
+配置了ffmpeg和rtmp，可以想办法同时输出到比如HLS等。
 
 > 有其它语言的开发者，可以参考我的“[JTT/1078音视频传输协议开发指南](https://www.hentai.org.cn/article?id=8)”，我所知道的官方文档里的错误或是缺陷以及坑，我全部写了下来，希望对你有帮助。
 
@@ -66,6 +60,8 @@ public abstract class AudioCodec
 ### 准备工具
 项目里准备了一个测试程序（`src/main/java/cn.org.hentai.jtt1078.test.VideoPushTest.java`），以及一个数据文件（`src/main/resources/tcpdump.bin`），数据文件是通过工具采集的一段几分钟时长的车载终端发送上来的原始消息包，测试程序可以持续不断的、慢慢的发送数据文件里的内容，用来模拟车载终端发送视频流的过程。
 
+另外，新增了 `cn.org.hentai.jtt1078.test.RTPGenerate` 类，用于读取bin文件，并且修改SIM卡号和通道号，创建大量数据文件以便于压力测试。
+
 ### 测试步骤
 1. 配置好服务器端，修改`app.properties`里的配置项。
 2. 直接在IDE里运行`cn.org.hentai.jtt1078.app.VideoServerApp`，或对项目进行打包，执行`mvn package`，执行`java -jar jtt1078-video-server-1.0-SNAPSHOT.jar`来启动服务器端。
@@ -88,10 +84,13 @@ public abstract class AudioCodec
 ### 项目文件说明
 ```
 
+
 ├── doc
-├── LICENSE
+│   ├── 1078.png（图标）
+│   └── ffmpeg.png
+├── LICENSE（开源协议）
 ├── pom.xml
-├── README.md
+├── README.md（项目说明）
 ├── src
 │   └── main
 │       ├── java
@@ -103,22 +102,34 @@ public abstract class AudioCodec
 │       │                   │   └── VideoServerApp.java（主入口程序）
 │       │                   ├── codec
 │       │                   │   ├── ADPCMCodec.java（ADPCM编解码器）
-│       │                   │   ├── AudioCodec.java（音频编解码器抽象类）
-│       │                   │   ├── G711Codec.java（G711A编解码器）
-│       │                   │   ├── G711UCodec.java（G711U编解码器）
-│       │                   │   └── RawDataCopyCodec.java
+│       │                   │   ├── AudioCodec.java（音频编解码抽象父类）
+│       │                   │   ├── G711Codec.java（G711A/alaw编解码器）
+│       │                   │   ├── G711UCodec.java（G711U/ulaw编解码器）
+│       │                   │   ├── g726（G726编解码实现）
+│       │                   │   │   ├── G726_16.java
+│       │                   │   │   ├── G726_24.java
+│       │                   │   │   ├── G726_32.java
+│       │                   │   │   ├── G726_40.java
+│       │                   │   │   ├── G726.java
+│       │                   │   │   └── G726State.java
+│       │                   │   ├── G726Codec.java（G726编解码器）
+│       │                   │   ├── MP3Encoder.java（PCM到MP3压缩编码器）
+│       │                   │   └── SilenceCodec.java（静音化解码器）
 │       │                   ├── entity
 │       │                   │   ├── Audio.java
 │       │                   │   ├── MediaEncoding.java
 │       │                   │   ├── Media.java
 │       │                   │   └── Video.java
 │       │                   ├── flv
-│       │                   │   └── FlvEncoder.java（H264到FLV封装编码器）
+│       │                   │   ├── AudioTag.java
+│       │                   │   ├── FlvAudioTagEncoder.java
+│       │                   │   ├── FlvEncoder.java（H264到FLV封装编码器）
+│       │                   │   └── FlvTag.java
 │       │                   ├── http（内置HTTP服务，提供HTTP-CHUNKED传输支持）
 │       │                   │   ├── GeneralResponseWriter.java
 │       │                   │   └── NettyHttpServerHandler.java
 │       │                   ├── publisher
-│       │                   │   ├── Channel.java（一个通道一个Channel实例，Subscriber订阅Channel上的音频或视频）
+│       │                   │   ├── Channel.java（一个通道一个Channel实例，Subscriber订阅Channel上的音频与视频）
 │       │                   │   └── PublishManager.java（管理Channel和Subscriber）
 │       │                   ├── server（负责完成1078 RTP消息包的接收和解码）
 │       │                   │   ├── Jtt1078Decoder.java
@@ -126,35 +137,42 @@ public abstract class AudioCodec
 │       │                   │   ├── Jtt1078MessageDecoder.java
 │       │                   │   └── Session.java
 │       │                   ├── subscriber
-│       │                   │   ├── AudioSubscriber.java（音频数据封装与订阅）
-│       │                   │   ├── Subscriber.java
-│       │                   │   └── VideoSubscriber.java（视频数据封装与订阅）
-│       │                   ├── test（一些测试代码）
+│       │                   │   ├── RTMPPublisher.java（通过ffmpeg子进程将http-flv另外传输一份到RTMP服务器的实现）
+│       │                   │   ├── Subscriber.java（订阅者抽象类定义）
+│       │                   │   └── VideoSubscriber.java（视频订阅者）
+│       │                   ├── test（测试代码）
 │       │                   │   ├── AudioTest.java
 │       │                   │   ├── ChannelTest.java
+│       │                   │   ├── FuckTest.java
 │       │                   │   ├── G711ATest.java
-│       │                   │   ├── RTPTest.java
-│       │                   │   ├── VideoPushTest.java（使用数据文件模拟终端发送音视频数据）
+│       │                   │   ├── MP3Test.java
+│       │                   │   ├── RTPGenerate.java（通过读取原始消息数据文件，创建N个修改了sim卡号的新数据文件，可用于压力测试）
+│       │                   │   ├── VideoPushTest.java
 │       │                   │   ├── VideoServer.java
 │       │                   │   └── WAVTest.java
 │       │                   └── util
+│       │                       ├── ByteBufUtils.java
 │       │                       ├── ByteHolder.java
 │       │                       ├── ByteUtils.java
 │       │                       ├── Configs.java
 │       │                       ├── FileUtils.java
 │       │                       ├── FLVUtils.java
-│       │                       ├── HttpChunk.java
 │       │                       ├── Packet.java
 │       │                       └── WAVUtils.java
 │       └── resources
 │           ├── app.properties（主配置文件）
 │           ├── audio.html
+│           ├── g726
+│           │   ├── in_16.g726
+│           │   ├── in_24.g726
+│           │   ├── in_32.g726
+│           │   └── in_40.g726
 │           ├── log4j.properties
 │           ├── multimedia.html（测试用音视频播放页面）
 │           ├── tcpdump.bin（测试用数据文件，音频ADPCM含海思头，视频H264）
+│           ├── nginx_sample.conf（NGINX反向代理样例，解决6路并发问题）
 │           ├── test.html
 │           └── video.html
-└─────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 
 ### 项目打包说明
