@@ -54,7 +54,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>app</finalName>
+        <finalName>${artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
