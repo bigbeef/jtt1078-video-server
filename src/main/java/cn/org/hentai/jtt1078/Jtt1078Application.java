@@ -11,10 +11,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  **/
 @Slf4j
 @SpringBootApplication(scanBasePackages = {"cn.org.hentai"})
-public class Application {
+public class Jtt1078Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(Jtt1078Application.class, args);
     }
 
 }
