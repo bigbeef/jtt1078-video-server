@@ -44,7 +44,7 @@ public class ChannelCheckSchedule {
                             channelCheckMap.put(tag, DateUtil.date());
                         } else {
                             // 超过30秒无人订阅，断开推流
-                            if (DateUtil.between(lastDate, DateUtil.date(), DateUnit.SECOND) > 30L) {
+                            if (DateUtil.between(lastDate, DateUtil.date(), DateUnit.SECOND) >= 30L) {
                                 ChannelHandlerContext pusherContext = channel.getPusherContext();
                                 if (pusherContext != null) {
                                     pusherContext.close();
@@ -60,7 +60,7 @@ public class ChannelCheckSchedule {
                     log.error("节流检测异常:" + tag, e);
                 }
             });
-        }, 0L, 30, TimeUnit.SECONDS);
+        }, 0L, 10, TimeUnit.SECONDS);
     }
 
 
