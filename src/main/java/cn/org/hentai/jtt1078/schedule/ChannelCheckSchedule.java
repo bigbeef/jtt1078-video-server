@@ -51,6 +51,7 @@ public class ChannelCheckSchedule {
                                     log.info("节流停止推流:" + tag);
                                 }
                                 channels.remove(tag);
+                                channelCheckMap.remove(tag);
                             }
                         }
                     } else {
