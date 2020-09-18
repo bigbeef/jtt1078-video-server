@@ -63,7 +63,7 @@ public final class PublishManager
         }
         // 设置设备推流的通道
         chl.setPusherContext(pusherContext);
-        if (chl.isPublishing()) throw new RuntimeException("channel already publishing");
+         if (chl.isPublishing()) throw new RuntimeException("channel already publishing");
         return chl;
     }
 
@@ -71,7 +71,11 @@ public final class PublishManager
     {
 //        Channel chl = channels.remove(tag);
         Channel chl = channels.get(tag);
-        if (chl != null) chl.close();
+
+        if (chl != null) {
+            // chl.close();
+            chl.publishing = false;
+        }
     }
 
     public void unsubscribe(String tag, long watcherId)

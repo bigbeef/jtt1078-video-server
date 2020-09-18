@@ -46,7 +46,7 @@ public class ChannelCheckSchedule {
                             // 超过30秒无人订阅，断开推流
                             if (DateUtil.between(lastDate, DateUtil.date(), DateUnit.SECOND) > 30L) {
                                 ChannelHandlerContext pusherContext = channel.getPusherContext();
-                                if (pusherContext != null && pusherContext.channel().isOpen()) {
+                                if (pusherContext != null) {
                                     pusherContext.close();
                                     log.info("节流停止推流:" + tag);
                                 }
