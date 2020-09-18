@@ -34,7 +34,7 @@ public class Jtt1078Handler extends SimpleChannelInboundHandler<Packet> {
         Session session = getSession();
         if (null == session) {
             setSession(session = new Session());
-            Channel chl = PublishManager.getInstance().open(tag);
+            Channel chl = PublishManager.getInstance().open(tag, ctx);
             session.set("tag", tag);
             log.info("start publishing: {} -> {}-{}", Long.toHexString(chl.hashCode() & 0xffffffffL), sim, channel);
         }

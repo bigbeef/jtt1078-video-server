@@ -3,6 +3,7 @@ package cn.org.hentai.jtt1078.publisher;
 import cn.org.hentai.jtt1078.entity.Media;
 import cn.org.hentai.jtt1078.subscriber.Subscriber;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class PublishManager
 {
     static Logger logger = LoggerFactory.getLogger(PublishManager.class);
+    @Getter
     ConcurrentHashMap<String, Channel> channels;
 
     private PublishManager()
@@ -51,7 +53,7 @@ public final class PublishManager
         if (chl != null) chl.writeVideo(sequence, timestamp, payloadType, data);
     }
 
-    public Channel open(String tag)
+    public Channel open(String tag,ChannelHandlerContext pusherContext)
     {
         Channel chl = channels.get(tag);
         if (chl == null)
@@ -59,13 +61,16 @@ public final class PublishManager
             chl = new Channel(tag);
             channels.put(tag, chl);
         }
+        // 设置设备推流的通道
+        chl.setPusherContext(pusherContext);
         if (chl.isPublishing()) throw new RuntimeException("channel already publishing");
         return chl;
     }
 
     public void close(String tag)
     {
-        Channel chl = channels.remove(tag);
+//        Channel chl = channels.remove(tag);
+        Channel chl = channels.get(tag);
         if (chl != null) chl.close();
     }
 

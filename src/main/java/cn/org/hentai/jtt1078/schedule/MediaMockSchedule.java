@@ -1,4 +1,4 @@
-package cn.org.hentai.jtt1078;
+package cn.org.hentai.jtt1078.schedule;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @author winfed
  **/
 @Service
-public class MediaMockService {
+public class MediaMockSchedule {
     @Value("${server.live.mock:false}")
     private Boolean isMock;
 
@@ -37,7 +37,7 @@ public class MediaMockService {
             Socket conn = new Socket("localhost", 1078);
             OutputStream os = conn.getOutputStream();
 
-            InputStream fis = MediaMockService.class.getResourceAsStream("/tcpdump.bin");
+            InputStream fis = MediaMockSchedule.class.getResourceAsStream("/tcpdump.bin");
             int len = -1;
             byte[] block = new byte[512];
             while ((len = fis.read(block)) > -1) {

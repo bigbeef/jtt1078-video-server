@@ -10,6 +10,9 @@ import cn.org.hentai.jtt1078.subscriber.VideoSubscriber;
 import cn.org.hentai.jtt1078.util.ByteHolder;
 import cn.org.hentai.jtt1078.util.Configs;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -24,8 +27,15 @@ public class Channel
 {
     static Logger logger = LoggerFactory.getLogger(Channel.class);
 
+    @Getter
     ConcurrentLinkedQueue<Subscriber> subscribers;
+
     RTMPPublisher rtmpPublisher;
+
+    // 推流的通道
+    @Setter
+    @Getter
+    private ChannelHandlerContext pusherContext;
 
     String tag;
     boolean publishing;
