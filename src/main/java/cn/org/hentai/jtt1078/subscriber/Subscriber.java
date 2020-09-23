@@ -1,9 +1,9 @@
 package cn.org.hentai.jtt1078.subscriber;
 
 import cn.org.hentai.jtt1078.flv.FlvEncoder;
-import cn.org.hentai.jtt1078.util.Packet;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +21,7 @@ public abstract class Subscriber extends Thread
     private long id;
     private String tag;
     private Object lock;
+    @Getter
     private ChannelHandlerContext context;
     protected LinkedList<byte[]> messages;
 
