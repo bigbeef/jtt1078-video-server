@@ -38,6 +38,7 @@ public class Channel
     private ChannelHandlerContext pusherContext;
 
     String tag;
+    @Getter
     boolean publishing;
     ByteHolder buffer;
     AudioCodec audioCodec;
