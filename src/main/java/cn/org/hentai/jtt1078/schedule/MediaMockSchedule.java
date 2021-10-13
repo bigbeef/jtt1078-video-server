@@ -32,7 +32,7 @@ public class MediaMockSchedule {
     }
 
     public void mock() {
-        // http://127.0.0.1:3333/test/multimedia#013800138999-2
+        // http://127.0.0.1:3333/page/multimedia#013800138999-2
         try {
             Socket conn = new Socket("localhost", 1078);
             OutputStream os = conn.getOutputStream();

@@ -67,7 +67,7 @@ public abstract class AudioCodec
 2. 直接在IDE里运行`cn.org.hentai.jtt1078.app.VideoServerApp`，或对项目进行打包，执行`mvn package`，执行`java -jar jtt1078-video-server-1.0-SNAPSHOT.jar`来启动服务器端。
 3. 运行`VideoPushTest.java`，开始模拟车载终端的视频推送。
 4. 开始后，控制台里会输出显示**start publishing: 013800138999-2**的字样
-5. 打开浏览器，输入 **http://localhost:3333/test/multimedia#013800138999-2** 后回车
+5. 打开浏览器，输入 **http://localhost:3333/page/multimedia#013800138999-2** 后回车
 6. 点击网页上的**play video**，开始播放视频
 
 ### 测试环境
@@ -76,10 +76,10 @@ public abstract class AudioCodec
 |标题|说明|
 |---|---|
 |1078音视频服务器|45.144.137.128:10780|
-|实时音视频播放页面|http://1078.hentai.org.cn/test/multimedia#SIM-CHANNEL|
+|实时音视频播放页面|http://1078.hentai.org.cn/page/multimedia#SIM-CHANNEL|
 
 1. 首先，本项目的 **/src/main/resources/** 下的 **tcpdump.bin** 即为我抓包存下来的终端音视频数据文件，通过`cat tcpdump.bin | pv -L 40k -q | nc 103.143.81.233 10780`即可以每秒40kBPS的速度，向服务器端持续的发送数据。
-2. 在浏览器里打开**http://1078.hentai.org.cn/test/multimedia#SIM-CHANNEL** （注意替换掉后面的SIM和CHANNEL，即终端的SIM卡号，不足12位前面补0，CHANNEL即为通道号），然后点击网页上的**play video**即可。
+2. 在浏览器里打开**http://1078.hentai.org.cn/page/multimedia#SIM-CHANNEL** （注意替换掉后面的SIM和CHANNEL，即终端的SIM卡号，不足12位前面补0，CHANNEL即为通道号），然后点击网页上的**play video**即可。
 
 ### 项目文件说明
 ```
