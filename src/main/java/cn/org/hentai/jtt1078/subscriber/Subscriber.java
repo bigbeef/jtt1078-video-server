@@ -99,6 +99,7 @@ public abstract class Subscriber extends Thread
         }
         catch(Exception ex)
         {
+            this.interrupt();
             return null;
         }
     }
